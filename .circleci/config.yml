@@ -1,0 +1,28 @@
+version: 2.1
+
+jobs:
+  docker_build:
+    machine:
+      image: ubuntu-2204:2022.04.1
+      docker_layer_caching: true
+      resource_class: 2xlarge
+
+    # https://github.com/istio/istio/wiki/Using-the-Code-Base#cloning-the-code
+    working_directory: /home/circleci/project/src/istio.io/istio
+    environment:
+      GOPATH: /home/circleci/project/src
+      ISTIO: /home/circleci/project/istio.io
+      TAG: nextdoor
+
+    steps:
+      - checkout
+
+      # https://github.com/istio/istio/wiki/Using-the-Code-Base#building-the-code
+      - run: make build
+      - run: make docker
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - docker_build:
+          context: staging
